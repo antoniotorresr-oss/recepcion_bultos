@@ -1,0 +1,811 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RECEPCION DE BULTOS</title>
+<style>
+:root{--bg:#0b1220;--card:#121a2a;--ink:#eaf1ff;--muted:#9fb0d1;--accent:#3aa0ff;--ok:#2ecc71;--bad:#ff6b6b;--warn:#ffb020;--edge:#1a2744}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;font:14px system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--ink)}button,input,select{font:inherit}
+.container{max-width:1200px;margin:auto;padding:16px}
+.card{background:linear-gradient(180deg,var(--card),#0e1627);border:1px solid var(--edge);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:16px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.col{flex:1 1 280px}
+.h{margin:0 0 8px}
+input,select,textarea{width:100%;background:#0b1528;border:1px solid #213356;color:var(--ink);padding:10px;border-radius:10px}
+input[type=number]{appearance:textfield}
+label{display:block;margin:8px 0 4px;color:var(--muted)}
+.btn{background:var(--accent);color:#001429;border:none;padding:10px 14px;border-radius:10px;cursor:pointer}
+.btn.alt{background:#1e2f52;color:var(--ink)}
+.btn.danger{background:var(--bad);color:#1a0b0b}
+.btn.warn{background:#ffb020;color:#1a1300}
+.btn.ghost{background:transparent;border:1px solid #28406e;color:var(--ink)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid #2a3f68;background:#0b1528;color:var(--muted);font-size:12px}
+.badge i{width:8px;height:8px;border-radius:50%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.tile{border:1px solid #213356;background:#0b1528;border-radius:16px;overflow:hidden;cursor:pointer;transition:.2s transform}
+.tile:hover{transform:translateY(-2px)}
+.tile .icon{width:100%;height:140px;display:block;background:#08101f}
+.tile .t{padding:12px;text-align:center;font-weight:600}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin:6px 0 14px}
+.small{font-size:12px;color:var(--muted)}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid #213356;padding:8px;text-align:left}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1528;border:1px solid #213356;border-bottom-width:2px;border-radius:6px;padding:2px 6px}
+.hidden{display:none}
+hr{border:none;border-top:1px solid #213356;margin:12px 0}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace}
+.center{display:flex;justify-content:center;align-items:center}
+label.req:after{content:" *";color:var(--bad)}
+.tag{display:inline-block;padding:2px 8px;border:1px solid #2a3f68;border-radius:999px;color:var(--muted);font-size:12px}
+.notice{padding:10px;border:1px dashed #2d477a;border-radius:10px;background:#0b1528;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="topbar">
+    <div>
+      <h2 class="h">RECEPCION DE BULTOS</h2>
+      <div class="small" id="whoami">Sesión: —</div>
+    </div>
+    <div class="row" style="gap:6px;align-items:center">
+      <span class="badge" id="jsbBadge" title="Estado de JsBarcode"><i style="background:#666"></i><span>JsBarcode</span></span>
+      <span class="badge" id="qgBadge" title="Estado de Quagga2"><i style="background:#666"></i><span>Quagga2</span></span>
+      <button class="btn alt" id="btnLogout" title="Cerrar sesión">Salir</button>
+    </div>
+  </header>
+
+  <!-- LOGIN -->
+  <section id="viewLogin" class="card">
+    <h3 class="h">Ingresar</h3>
+    <div class="row">
+      <div class="col"><label class="req">Usuario</label><input id="liUser" autocomplete="username"/></div>
+      <div class="col"><label class="req">Contraseña</label><input id="liPass" type="password" autocomplete="current-password"/></div>
+    </div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="btnLogin">Entrar</button>
+      <span class="small">Usuario inicial: <span class="kbd">admin</span> / <span class="kbd">1234</span></span>
+    </div>
+    <div class="small" id="liMsg"></div>
+  </section>
+
+  <!-- HOME -->
+  <section id="viewHome" class="card hidden">
+    <h3 class="h">Selecciona un panel</h3>
+    <div class="grid">
+      <div class="tile" data-goto="recep">
+        <svg class="icon" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Recepción">
+          <rect x="8" y="18" width="104" height="44" rx="4" fill="#2aa35d"/>
+          <path d="M12 20h40v16H12zM68 20h40v16H68z" fill="#4c8aff"/>
+          <rect x="44" y="36" width="32" height="16" fill="#112132"/>
+          <path d="M8 18l52-12 52 12" fill="none" stroke="#1a2744" stroke-width="3"/>
+        </svg>
+        <div class="t">Recepción</div>
+      </div>
+      <div class="tile" data-goto="desp">
+        <svg class="icon" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Despacho">
+          <rect x="8" y="36" width="64" height="22" rx="3" fill="#2aa35d"/>
+          <rect x="72" y="36" width="24" height="14" rx="2" fill="#4c8aff"/>
+          <path d="M96 36h12l8 10v6H96z" fill="#2aa35d"/>
+          <circle cx="36" cy="64" r="7" fill="#4c8aff"/>
+          <circle cx="92" cy="64" r="7" fill="#4c8aff"/>
+        </svg>
+        <div class="t">Despacho</div>
+      </div>
+      <div class="tile" data-goto="admin">
+        <svg class="icon" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Administración">
+          <circle cx="60" cy="28" r="16" fill="#4c8aff"/>
+          <path d="M20 72c0-18 18-28 40-28s40 10 40 28" fill="#2aa35d"/>
+        </svg>
+        <div class="t">Administración de usuarios</div>
+      </div>
+      <div class="tile" data-goto="reps">
+        <svg class="icon" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Reportería">
+          <rect x="22" y="20" width="16" height="36" fill="#4c8aff"/>
+          <rect x="46" y="32" width="16" height="24" fill="#4c8aff"/>
+          <rect x="70" y="26" width="16" height="30" fill="#4c8aff"/>
+          <path d="M22 52l16-10 16 6 16-14 16 8" fill="none" stroke="#2aa35d" stroke-width="3"/>
+        </svg>
+        <div class="t">Reportería</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECEPCION -->
+  <section id="viewRecep" class="card hidden">
+    <div class="topbar"><div class="row" style="gap:8px;align-items:center"><button class="btn alt" data-back>⬅ Volver</button><h3 class="h">Recepción</h3></div><span class="tag">Etiqueta 10×5 cm</span></div>
+    <div class="row">
+      <div class="col"><label>Usuario</label><input id="rcUser" disabled/></div>
+      <div class="col"><label>Fecha / hora</label><input id="rcFecha" type="datetime-local"/></div>
+      <div class="col"><label class="req">Cantidad de bultos</label><input id="rcQty" type="number" min="1" value="1"/></div>
+    </div>
+    <div class="row">
+      <div class="col"><label>Proveedor/Origen</label><input id="rcProv"/></div>
+      <div class="col"><label>Nº Factura</label><input id="rcFac"/></div>
+      <div class="col"><label>Nº Orden de compra</label><input id="rcOc"/></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label class="req">Destino</label>
+        <select id="rcDst"><option value="">— Selecciona destino —</option></select>
+      </div>
+      <div class="col" style="align-self:end"><button class="btn" id="btnSaveRc">Guardar recepción</button></div>
+    </div>
+    <hr/>
+    <details open>
+      <summary><b>Historial</b></summary>
+      <div class="row">
+        <div class="col"><label>Buscar</label><input id="hisQ" placeholder="texto libre"/></div>
+        <div class="col"><label>Desde</label><input id="hisD1" type="date"/></div>
+        <div class="col"><label>Hasta</label><input id="hisD2" type="date"/></div>
+      </div>
+      <div class="row" style="margin-top:6px"><button class="btn alt" id="btnFiltrar">Filtrar</button><button class="btn ghost" id="btnClrFil">Limpiar</button></div>
+      <table class="table" id="tblRc"><thead><tr><th>Fecha</th><th>Código</th><th>Proveedor</th><th>Destino</th><th>Factura</th><th>OC</th><th>Imprimir</th></tr></thead><tbody></tbody></table>
+    </details>
+
+    <template id="tplEtiqueta">
+      <div style="width:10cm;height:5cm;padding:.2cm;display:flex;gap:.2cm;font-family:Arial,Helvetica,sans-serif">
+        <div style="flex:1">
+          <div style="font-weight:bold;font-size:14pt">RECEPCION DE BULTOS</div>
+          <div style="font-size:10pt">Código: <span data-f=code></span></div>
+          <div style="font-size:10pt">Destino: <span data-f=dst></span></div>
+          <div style="font-size:10pt">Proveedor: <span data-f=prov></span></div>
+          <div style="font-size:10pt">Factura: <span data-f=fac></span> · OC: <span data-f=oc></span></div>
+          <div style="font-size:10pt">Fecha: <span data-f=fecha></span></div>
+        </div>
+        <div style="width:5cm;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <svg data-f=barcode></svg>
+          <div style="font-size:11pt;margin-top:2mm" data-f=code2></div>
+        </div>
+      </div>
+    </template>
+  </section>
+
+  <!-- DESPACHO -->
+  <section id="viewDesp" class="card hidden">
+    <div class="topbar"><div class="row" style="gap:8px;align-items:center"><button class="btn alt" data-back>⬅ Volver</button><h3 class="h">Despacho</h3></div><div class="small">Escáner Quagga2 o modo teclado</div></div>
+    <div class="row">
+      <div class="col"><label>Código escaneado</label><input id="dsInput" placeholder="Usa cámara o escribe y Enter"/></div>
+      <div class="col" style="align-self:end"><button class="btn" id="btnStart">Iniciar cámara</button> <button class="btn ghost" id="btnStop">Detener</button></div>
+    </div>
+    <div id="camera" class="card" style="margin-top:10px;display:none">
+      <div class="notice">Si el navegador solicita permisos, elige <b>Permitir</b>. Si rechazas, usa el campo de texto como fallback.</div>
+      <div id="camMsg" class="small" style="margin:6px 0"></div>
+      <div id="live" style="position:relative;max-width:640px"></div>
+    </div>
+    <hr/>
+    <div class="row">
+      <div class="col"><label>Desde</label><input id="dsD1" type="date"/></div>
+      <div class="col"><label>Hasta</label><input id="dsD2" type="date"/></div>
+      <div class="col"><label><input type="checkbox" id="dsNo"/> Solo no despachados</label></div>
+      <div class="col" style="align-self:end"><button class="btn alt" id="btnFilDesp">Filtrar</button></div>
+    </div>
+    <table class="table" id="tblDesp"><thead><tr><th>Fecha recepción</th><th>Código</th><th>Destino</th><th>Despachado</th><th>Fecha/Hora</th><th>Usuario</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <!-- REPORTERIA -->
+  <section id="viewReps" class="card hidden">
+    <div class="topbar">
+      <div class="row" style="gap:8px;align-items:center"><button class="btn alt" data-back>⬅ Volver</button><h3 class="h">Reportería</h3></div>
+      <span class="tag">Exporta a Excel (CSV)</span>
+    </div>
+    <div class="row">
+      <div class="col"><label>Desde</label><input id="rpD1" type="date"/></div>
+      <div class="col"><label>Hasta</label><input id="rpD2" type="date"/></div>
+      <div class="col" style="align-self:end"><button class="btn" id="btnExport">Exportar</button></div>
+    </div>
+    <div class="small" id="rpMsg"></div>
+    <table class="table" id="tblPreview"><thead><tr><th>Código</th><th>Fecha recepción</th><th>Destino</th><th>Proveedor</th><th>Factura</th><th>OC</th><th>Usuario recepción</th><th>Despachado</th><th>Fecha/Hora despacho</th><th>Usuario despacho</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="viewAdmin" class="card hidden">
+    <div class="topbar"><div class="row" style="gap:8px;align-items:center"><button class="btn alt" data-back>⬅ Volver</button><h3 class="h">Administración de usuarios</h3></div><span class="tag">Solo admin</span></div>
+    <div class="row">
+      <div class="col"><label class="req">Usuario</label><input id="adUser"/></div>
+      <div class="col"><label class="req">Contraseña</label><input id="adPass"/></div>
+      <div class="col"><label>Rol</label><select id="adRol"><option value="user">user</option><option value="admin">admin</option></select></div>
+      <div class="col" style="align-self:end"><button class="btn" id="btnAddUser">Crear / Actualizar</button></div>
+    </div>
+    <div class="row"><div class="col"><label>Acciones</label>
+      <div class="row"><button class="btn warn" id="btnAudit">Ver auditoría</button><button class="btn danger" id="btnWipe">Borrar base de datos</button></div>
+    </div></div>
+    <hr/>
+    <table class="table" id="tblUsers"><thead><tr><th>Usuario</th><th>Rol</th><th>Activo</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+    <dialog id="dlgAudit" style="max-width:900px;width:90%">
+      <h3>Auditoría</h3>
+      <div class="small">Log de login, logout, cambios, impresiones, borrados</div>
+      <div id="auditBox" class="card" style="max-height:50vh;overflow:auto"></div>
+      <form method="dialog" style="margin-top:8px"><button class="btn alt">Cerrar</button></form>
+    </dialog>
+  </section>
+</div>
+
+<!-- Credenciales pedidas -->
+<script>
+  const NEXT_PUBLIC_SUPABASE_URL = "https://ucbjahyowscrjethdzxl.supabase.co";
+  const NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjYmphaHlvd3NjcmpldGhkenhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjgzNTAsImV4cCI6MjA3MzYwNDM1MH0.Cz9wWKY1zU7ZbHdBf1KNxxbrIqw1vsRO4s4986n7h4s";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(()=>{'use strict';
+
+const $=sel=>document.querySelector(sel),$$=sel=>Array.from(document.querySelectorAll(sel));
+const V={login:$('#viewLogin'),home:$('#viewHome'),recep:$('#viewRecep'),desp:$('#viewDesp'),admin:$('#viewAdmin'),reps:$('#viewReps')};
+const S={US:'rb_users',RC:'rb_recepciones',AU:'rb_audit'};
+const state={me:null,jsb:false,qg:false,counter:0};
+const destinos=["Planta 1","Planta 2","Planta 3","Planta 4","Planta 5","Planta 6","FMP","BIS","Arica","Iquique","Antofagasta","Calama","Copiapó","Serena","Concón","CDS (Renca)","TBS (San Bernardo)","Rancagua","Chillán","Concepción","Temuco","Valdivia","Puerto Montt","Coyhaique","Punta Arenas"];
+
+// init destinos
+(()=>{const sel=$('#rcDst');destinos.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;sel.appendChild(o)})})();
+
+// Fechas y utilidades
+const now=()=>new Date(); const pad=n=>String(n).padStart(2,'0');
+const fmtDisp=(d)=>`${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()}/${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const fmtInputLocal=(d)=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const esc=s=>(s??'').toString().replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+
+// CDN libs badges
+function badge(el,ok,msg){el.querySelector('i').style.background=ok?'#2ecc71':'#ff6b6b';if(msg)el.title=msg}
+const hasJsBarcode=()=>!!(window.JsBarcode);
+const hasQuagga=()=>!!(window.Quagga&&window.Quagga.init);
+
+// Supabase client
+const supa = window.supabase.createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+// Local session only
+const sess = { g:()=>JSON.parse(localStorage.getItem('rb_session')||'null'),
+               s:(v)=>localStorage.setItem('rb_session',JSON.stringify(v)) };
+
+// Auditoría: intenta DB, si falla, ignora silencioso
+async function audit(act,extra){
+  try{
+    await supa.from(S.AU).insert({who:state.me?.user||'-',act,extra:extra??null});
+  }catch{}
+}
+
+// Código 10 dígitos
+function genCode(){const base=Date.now().toString().slice(-9);state.counter=(state.counter+1)%10;return (base+state.counter).padStart(10,'0')}
+
+// ====== Capa de datos (DB primero, fallback localStorage sólo si DB falla) ======
+const local = {
+  US:()=>JSON.parse(localStorage.getItem(S.US)||'[]'),
+  setUS:(u)=>localStorage.setItem(S.US,JSON.stringify(u)),
+  RC:()=>JSON.parse(localStorage.getItem(S.RC)||'[]'),
+  setRC:(r)=>localStorage.setItem(S.RC,JSON.stringify(r)),
+};
+
+async function ensureAdmin(){
+  // DB: si no existe admin, lo crea
+  const { data, error } = await supa.from(S.US).select('user').eq('user','admin').maybeSingle();
+  if(error){ // fallback local
+    let u=local.US(); if(!u.some(x=>x.user==='admin')){u.push({user:'admin',pass:'1234',role:'admin',active:true})}
+    u=u.map(x=>x.user==='admin'?{user:'admin',pass:x.pass||'1234',role:x.role||'admin',active:(x.active!==false)}:x);
+    if(!u.some(x=>x.role==='admin'&&x.active))u=u.map(x=>x.user==='admin'?{...x,active:true}:x);
+    local.setUS(u);
+    return;
+  }
+  if(!data){
+    await supa.from(S.US).insert({user:'admin',pass:'1234',role:'admin',active:true});
+  }
+}
+
+async function loginDB(u,p){
+  // DB auth simple por tabla rb_users
+  const { data, error } = await supa.from(S.US).select('user,role,active,pass').eq('user',u).maybeSingle();
+  if(error) return null;
+  if(!data) return { ok:false,msg:'Usuario no existe' };
+  if(!data.active) return { ok:false,msg:'Usuario inactivo' };
+  if(data.pass!==p) return { ok:false,msg:'Contraseña incorrecta' };
+  return { ok:true, me:{user:data.user, role:data.role} };
+}
+
+function setWho(){
+  $('#whoami').textContent = state.me?`Sesión: ${state.me.user} (${state.me.role})`:'Sesión: —';
+}
+
+async function restore(){
+  await ensureAdmin();
+  const st=sess.g();
+  if(st&&st.me){ state.me=st.me; setWho(); show('home'); }
+  else { show('login'); }
+}
+
+function logout(){
+  audit('logout');
+  state.me=null; sess.s(null); setWho(); show('login');
+}
+
+// Recepciones: guardar N filas
+async function saveRecepDB(rc, qty){
+  const made=[];
+  for(let i=0;i<qty;i++){
+    let ok=false; let tries=0;
+    while(!ok && tries<5){
+      tries++;
+      const code = genCode();
+      const row = {
+        code,
+        user_recep: rc.user,
+        fecha_txt: rc.fecha,
+        dt_recep: rc.dt,
+        prov: rc.prov||null,
+        fac: rc.fac||null,
+        oc: rc.oc||null,
+        dst: rc.dst
+      };
+      const { error } = await supa.from(S.RC).insert(row, { returning:'minimal' });
+      if(!error){ made.push({ ...row, desp_user:null, desp_ts:null }); ok=true; }
+    }
+  }
+  return made;
+}
+
+async function listRecepDB(filters){
+  let q=supa.from(S.RC).select('code, user_recep, fecha_txt, dt_recep, prov, fac, oc, dst, desp_user, desp_ts').order('dt_recep',{ascending:false});
+  if(filters?.d1) q=q.gte('dt_recep', filters.d1+'T00:00:00');
+  if(filters?.d2) q=q.lte('dt_recep', filters.d2+'T23:59:59.999');
+  const { data, error } = await q;
+  if(error) return null;
+  let list = data||[];
+  if(filters?.q){
+    const text=filters.q.toLowerCase();
+    list = list.filter(x=>Object.values(x).some(v=>String(v??'').toLowerCase().includes(text)));
+  }
+  return list;
+}
+
+async function markDespDB(code, user){
+  const ts=new Date().toISOString();
+  const { error } = await supa.from(S.RC).update({ desp_user:user, desp_ts:ts }).eq('code',code).is('desp_ts',null);
+  if(error) return false;
+  return true;
+}
+
+async function exportRowsDB(d1,d2){
+  let q=supa.from(S.RC).select('code,fecha_txt,dt_recep,dst,prov,fac,oc,user_recep,desp_user,desp_ts').order('dt_recep',{ascending:false});
+  if(d1) q=q.gte('dt_recep', d1+'T00:00:00');
+  if(d2) q=q.lte('dt_recep', d2+'T23:59:59.999');
+  const { data, error } = await q;
+  if(error) return [];
+  return (data||[]).map(r=>({
+    code:r.code,
+    fecha_recep:r.fecha_txt,
+    dt_recep:r.dt_recep,
+    destino:r.dst||'',
+    proveedor:r.prov||'',
+    factura:r.fac||'',
+    oc:r.oc||'',
+    user_recep:r.user_recep||'',
+    despachado:!!r.desp_ts,
+    fecha_desp:r.desp_ts?new Date(r.desp_ts).toLocaleString():'',
+    user_desp:r.desp_user||''
+  }));
+}
+
+async function listUsersDB(){
+  const { data, error } = await supa.from(S.US).select('user,role,active').order('user');
+  if(error) return null;
+  return data||[];
+}
+async function upsertUserDB(user,pass,role){
+  await supa.from(S.US).upsert({user,pass,role,active:true},{onConflict:'user'});
+}
+async function toggleUserDB(user,newState){
+  await supa.from(S.US).update({active:newState}).eq('user',user);
+}
+async function chgPwdDB(user,newPass){
+  await supa.from(S.US).update({pass:newPass}).eq('user',user);
+}
+async function chgRolDB(user,newRol){
+  await supa.from(S.US).update({role:newRol}).eq('user',user);
+}
+async function wipeDB(){
+  await supa.from(S.RC).delete().neq('code','__never__');
+  audit('wipe_rc_desp');
+}
+
+// ====== UI helpers y render ======
+function show(id){Object.values(V).forEach(x=>x.classList.add('hidden'));V[id].classList.remove('hidden')}
+function goHome(){show('home')}
+
+function getDt(r){ return r.dt_recep?new Date(r.dt_recep):new Date(0); }
+
+// Historial
+async function renderHis(){
+  const q=$('#hisQ').value||'';
+  const d1=$('#hisD1').value, d2=$('#hisD2').value;
+  const tb=$('#tblRc tbody'); tb.innerHTML='';
+  let list = await listRecepDB({q,d1,d2});
+  if(!list){ list=[] } // si DB falla, no rompas la UI
+  for(const r of list){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${esc(r.fecha_txt)}</td><td><span class="kbd">${r.code}</span></td><td>${esc(r.prov||'')}</td><td>${esc(r.dst||'')}</td><td>${esc(r.fac||'')}</td><td>${esc(r.oc||'')}</td><td><button class="btn alt" data-print='${r.code}'>Imprimir</button></td>`;
+    tb.appendChild(tr);
+  }
+  tb.querySelectorAll('[data-print]').forEach(b=>b.onclick=async()=>{
+    const one = list.find(x=>x.code===b.dataset.print);
+    if(one) previewEtiqueta({
+      code: one.code, prov: one.prov||'', fac: one.fac||'', oc: one.oc||'',
+      dst: one.dst||'', fecha: one.fecha_txt||''
+    })
+  });
+}
+
+// Despacho
+async function renderDesp(){
+  const d1=$('#dsD1').value, d2=$('#dsD2').value, onlyNo=$('#dsNo').checked;
+  const tb=$('#tblDesp tbody'); tb.innerHTML='';
+  let list = await listRecepDB({d1,d2});
+  if(!list) list=[];
+  if(onlyNo) list=list.filter(x=>!x.desp_ts);
+  for(const r of list){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${esc(r.fecha_txt)}</td><td><span class="kbd">${r.code}</span></td><td>${esc(r.dst||'')}</td><td>${r.desp_ts?'<span class=tag>sí</span>':'<span class=tag>no</span>'}</td><td>${r.desp_ts?new Date(r.desp_ts).toLocaleString():''}</td><td>${esc(r.desp_user||'')}</td>`;
+    tb.appendChild(tr);
+  }
+}
+
+async function onScan(code){
+  code=(code||'').trim(); if(!code) return;
+  const ok = await markDespDB(code, state.me.user);
+  if(!ok) alert('Código no encontrado o ya despachado');
+  $('#dsInput').value=''; renderDesp();
+}
+
+// ReporterÍa
+function toCSV(rows){const headers=["codigo","fecha_recepcion","destino","proveedor","factura","oc","usuario_recepcion","despachado","fecha_hora_despacho","usuario_despacho"];const escv=v=>(''+(v??'')).replace(/"/g,'""');let out=headers.join(',')+'\n';for(const r of rows){out+=[r.code,r.fecha_recep,r.destino,r.proveedor,r.factura,r.oc,r.user_recep,r.despachado?'si':'no',r.fecha_desp,r.user_desp].map(x=>'"'+escv(x)+'"').join(',')+'\n'}return out}
+function downloadCSV(rows){const csv=toCSV(rows);const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);const d=new Date();a.download=`reporte_bultos_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.csv`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},0)}
+
+async function repGetRows(){
+  const d1=$('#rpD1').value, d2=$('#rpD2').value;
+  return await exportRowsDB(d1,d2);
+}
+async function repRenderPreview(){
+  const rows=await repGetRows();
+  const tb=$('#tblPreview tbody'); tb.innerHTML='';
+  rows.slice(0,200).forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.code}</td><td>${r.fecha_recep}</td><td>${esc(r.destino)}</td><td>${esc(r.proveedor)}</td><td>${esc(r.factura)}</td><td>${esc(r.oc)}</td><td>${esc(r.user_recep)}</td><td>${r.despachado?'sí':'no'}</td><td>${esc(r.fecha_desp)}</td><td>${esc(r.user_desp)}</td>`;
+    tb.appendChild(tr)
+  });
+  $('#rpMsg').textContent=`${rows.length} fila(s) para exportar`;
+}
+
+// Admin
+async function renderUsers(){
+  const data = await listUsersDB();
+  const tb=$('#tblUsers tbody'); tb.innerHTML='';
+  const list = data||[];
+  for(const a of list){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${esc(a.user)}</td><td>${a.role}</td><td>${a.active?'Activo':'Inactivo'}</td><td class=small></td>`;
+    const td=tr.lastChild;
+    const btnAct=document.createElement('button'); btnAct.className='btn alt'; btnAct.textContent=a.active?'Inactivar':'Activar';
+    btnAct.onclick=async()=>{await toggleUserDB(a.user,!a.active); renderUsers()};
+    const btnPwd=document.createElement('button'); btnPwd.className='btn ghost'; btnPwd.textContent='Cambiar pass';
+    btnPwd.onclick=async()=>{const pass=prompt('Nueva contraseña para '+a.user+':'); if(!pass)return; await chgPwdDB(a.user,pass); audit('user_pass',{user:a.user});};
+    const btnRol=document.createElement('button'); btnRol.className='btn ghost'; btnRol.textContent='Cambiar rol';
+    btnRol.onclick=async()=>{const newRol=a.role==='admin'?'user':'admin'; await chgRolDB(a.user,newRol); audit('user_rol',{user:a.user,rol:newRol}); renderUsers();};
+    td.append(btnAct,' ',btnPwd,' ',btnRol);
+    tb.appendChild(tr);
+  }
+}
+
+// Etiquetas / impresión
+function makeEtiqueta(rec){
+  const tpl=$('#tplEtiqueta').content.cloneNode(true);
+  tpl.querySelector('[data-f=code]').textContent=rec.code;
+  tpl.querySelector('[data-f=code2]').textContent=rec.code;
+  tpl.querySelector('[data-f=prov]').textContent=rec.prov||'-';
+  tpl.querySelector('[data-f=fac]').textContent=rec.fac||'-';
+  tpl.querySelector('[data-f=oc]').textContent=rec.oc||'-';
+  tpl.querySelector('[data-f=dst]').textContent=rec.dst||'';
+  tpl.querySelector('[data-f=fecha]').textContent=rec.fecha||'';
+  const svg=tpl.querySelector('[data-f=barcode]');
+  if(hasJsBarcode()){
+    try{window.JsBarcode(svg,rec.code,{format:'CODE128',displayValue:false,height:60,margin:0});}
+    catch(e){simpleBarcode(svg,rec.code)}
+  } else { simpleBarcode(svg,rec.code) }
+  return tpl;
+}
+
+function previewEtiqueta(rec){
+  const w=window.open('about:blank','_blank','width=800,height=450');
+  if(!w){alert('Bloqueo de ventanas emergentes. Habilita pop-ups para imprimir etiquetas.');return}
+  const doc=w.document;
+  const setup=()=>{try{
+    doc.title='Etiqueta '+rec.code;
+    const head=doc.head||doc.getElementsByTagName('head')[0]||doc.documentElement.appendChild(doc.createElement('head'));
+    const style=doc.createElement('style');
+    style.textContent='@page{size:10cm 5cm;margin:0}body{margin:0}#wrap{width:10cm;height:5cm;display:flex;align-items:center;justify-content:center}';
+    head.appendChild(style);
+    const wrap=doc.createElement('div'); wrap.id='wrap'; doc.body.appendChild(wrap); wrap.appendChild(makeEtiqueta(rec));
+    w.addEventListener('afterprint',()=>{try{w.close()}catch{}});
+    setTimeout(()=>{w.focus();w.print();audit('impresion',{code:rec.code})},150);
+  }catch(e){console.error(e);alert('No se pudo preparar la impresión de la etiqueta.')}};
+  if(doc.readyState==='complete'||doc.readyState==='interactive'){setup()}else{doc.addEventListener('DOMContentLoaded',setup,{once:true})}
+}
+
+function simpleBarcode(svg,txt){
+  const W=170,H=70; svg.setAttribute('viewBox',`0 0 ${W} ${H}`); while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g'); svg.appendChild(g); let x=2;
+  for(const ch of txt){const n=ch.charCodeAt(0); for(let i=0;i<7;i++){const w=(n>>i&1)?3:1; const rect=document.createElementNS('http://www.w3.org/2000/svg','rect'); rect.setAttribute('x',x);rect.setAttribute('y',2);rect.setAttribute('width',w);rect.setAttribute('height',H-6);rect.setAttribute('fill','#000'); g.appendChild(rect); x+=w+1} x+=2}
+}
+
+// Cámara / Quagga2
+function envAllowsCamera(){const isHttps=location.protocol==='https:';const isLocal=['localhost','127.0.0.1','::1'].includes(location.hostname);return (isHttps||isLocal)&&('mediaDevices'in navigator)}
+async function ensureCameraPermission(){if(!('mediaDevices'in navigator)&&!('getUserMedia'in (navigator.mediaDevices||{})))throw new Error('no_media');let stream;try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});return stream;}finally{if(stream)stream.getTracks().forEach(t=>t.stop())}}
+function camMsg(txt){const el=$('#camMsg');if(el)el.textContent=txt||''}
+let qRunning=false;let qHandler=null;
+async function startCam(){
+  if(qRunning){camMsg('La cámara ya está en ejecución.');return}
+  if(!hasQuagga()){alert('Quagga2 no cargó. Usa modo teclado.');return}
+  $('#camera').style.display='block'; camMsg('');
+  if(!envAllowsCamera()){ camMsg('Para usar la cámara abre esta página en HTTPS o desde localhost.'); alert('La cámara requiere HTTPS o localhost. Usa teclado como fallback.'); return; }
+  try{ await ensureCameraPermission(); }catch(e){
+    if(e&&e.name==='NotAllowedError'){ camMsg('Permiso de cámara denegado.'); alert('Permiso de cámara denegado.'); return; }
+    if(location.protocol!=='https:'&&!['localhost','127.0.0.1','::1'].includes(location.hostname)){ camMsg('Entorno no seguro.'); }
+    alert('No se pudo acceder a la cámara ('+(e?.name||'desconocido')+').'); return;
+  }
+  try{
+    window.Quagga.init({
+      inputStream:{type:'LiveStream',target:document.querySelector('#live'),constraints:{facingMode:'environment'}},
+      decoder:{readers:["code_128_reader","ean_reader","ean_8_reader","code_39_reader"]}
+    },err=>{
+      if(err){alert('No se pudo iniciar cámara: '+(err.message||err));return}
+      window.Quagga.start(); qRunning=true;
+      if(qHandler && window.Quagga.offDetected){try{window.Quagga.offDetected(qHandler)}catch{}}
+      qHandler=(res=>{const code=res?.codeResult?.code;if(code)onScan(code)});
+      if(window.Quagga.onDetected)window.Quagga.onDetected(qHandler);
+      camMsg('Cámara iniciada. Apunta al código.');
+    });
+  }catch(e){ alert('Error al iniciar la cámara.'); }
+}
+function stopCam(){try{if(window.Quagga&&qRunning){if(window.Quagga.offDetected&&qHandler){try{window.Quagga.offDetected(qHandler)}catch{}}window.Quagga.stop();qRunning=false;camMsg('Cámara detenida.')}}finally{$('#camera').style.display='none'}}
+window.addEventListener('visibilitychange',()=>{if(document.hidden)stopCam()});
+window.addEventListener('beforeunload',stopCam);
+
+// Eventos
+$('#btnLogin').onclick=async()=>{
+  await ensureAdmin();
+  const u=$('#liUser').value.trim(), p=$('#liPass').value;
+  const r = await loginDB(u,p);
+  if(!r){ $('#liMsg').textContent='No se pudo conectar a la base. Reintenta.'; return; }
+  if(!r.ok){ $('#liMsg').textContent=r.msg; return; }
+  state.me=r.me; sess.s({me:state.me}); setWho(); audit('login'); goHome();
+};
+$('#btnLogout').onclick=logout;
+$$('[data-back]').forEach(b=>b.onclick=goHome);
+
+$('#btnSaveRc').onclick=async()=>{
+  const qty=+$('#rcQty').value||0; if(qty<1) return alert('Cantidad inválida');
+  const dst=$('#rcDst').value; if(!dst) return alert('Selecciona destino');
+  const dtLocal=$('#rcFecha').value?new Date($('#rcFecha').value):new Date();
+  const rc={ user:state.me.user, fecha:fmtDisp(dtLocal), dt:dtLocal.toISOString(), prov:$('#rcProv').value.trim(), fac:$('#rcFac').value.trim(), oc:$('#rcOc').value.trim(), dst };
+  const made = await saveRecepDB(rc, qty);
+  audit('recep_guardada',{count:qty,dst});
+  renderHis();
+  if(made.length){
+    previewEtiqueta({ code: made[0].code, prov: rc.prov, fac: rc.fac, oc: rc.oc, dst: rc.dst, fecha: rc.fecha });
+  }
+};
+
+$('#btnFiltrar').onclick=renderHis; $('#btnClrFil').onclick=()=>{$('#hisQ').value=$('#hisD1').value=$('#hisD2').value='';renderHis()}
+$('#btnStart').onclick=startCam; $('#btnStop').onclick=stopCam; $('#btnFilDesp').onclick=renderDesp;
+$('#dsInput').addEventListener('keydown',e=>{if(e.key==='Enter')onScan(e.target.value)})
+
+$('#rpD1').addEventListener('change',repRenderPreview); $('#rpD2').addEventListener('change',repRenderPreview);
+$('#btnExport').onclick=async()=>{const rows=await repGetRows(); downloadCSV(rows)};
+
+// Tiles routing
+$$('.tile').forEach(t=>t.onclick=()=>{
+  const to=t.dataset.goto;
+  if(to==='admin'&&state.me?.role!=='admin'){alert('Solo admin');return}
+  if(to==='recep'){show('recep'); setupRecep()}
+  if(to==='desp'){show('desp'); renderDesp()}
+  if(to==='reps'){show('reps'); repRenderPreview()}
+  if(to==='admin'){show('admin'); renderUsers()}
+});
+
+function setupRecep(){ $('#rcUser').value=state.me.user; $('#rcFecha').value=fmtInputLocal(now()); renderHis(); }
+
+// Admin create/update
+$('#btnAddUser').onclick=async()=>{
+  const user=$('#adUser').value.trim(), pass=$('#adPass').value.trim(), role=$('#adRol').value;
+  if(!user||!pass) return alert('Completa usuario/contraseña');
+  await upsertUserDB(user,pass,role);
+  audit('user_save',{user,role});
+  renderUsers(); $('#adUser').value=$('#adPass').value='';
+};
+
+// Wipe
+$('#btnWipe').onclick=async()=>{
+  if(!confirm('¿Borrar TODOS los registros de recepción y despacho? (no afecta usuarios ni auditoría)')) return;
+  await wipeDB();
+  alert('Recepciones y despachos borrados.');
+  renderHis(); renderDesp(); repRenderPreview();
+};
+
+// Auditoría
+$('#btnAudit').onclick=async()=>{
+  try{
+    const { data } = await supa.from(S.AU).select('*').order('ts',{ascending:false}).limit(500);
+    const box=$('#auditBox');
+    box.innerHTML=(data||[]).map(x=>`<div><span class=small>${new Date(x.ts).toLocaleString()}</span> — <b>${esc(x.act)}</b> — ${esc(JSON.stringify(x.extra)||'')} — ${esc(x.who||'-')}</div>`).join('');
+    $('#dlgAudit').showModal();
+  }catch{
+    alert('No se pudo cargar auditoría.');
+  }
+};
+
+// Carga librerías de códigos
+async function loadLibs(){
+  const load=(urls)=>new Promise(r=>{let i=0;const step=()=>{if(i>=urls.length)return r(false);const s=document.createElement('script');s.src=urls[i++];s.defer=true;s.onload=()=>r(true);s.onerror=step;document.head.appendChild(s)};step()});
+  try{await load([
+    'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js',
+    'https://unpkg.com/jsbarcode@3.11.6/dist/JsBarcode.all.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js'
+  ])}catch{}
+  state.jsb=hasJsBarcode(); badge($('#jsbBadge'),state.jsb,state.jsb?'Cargado':'No cargó');
+
+  try{await load([
+    'https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.2.8/dist/quagga.min.js',
+    'https://unpkg.com/@ericblade/quagga2@1.2.8/dist/quagga.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js'
+  ])}catch{}
+  state.qg=hasQuagga(); badge($('#qgBadge'),state.qg,state.qg?'Cargado':'Usa teclado');
+}
+
+// Guardias globales
+window.addEventListener('error',ev=>{console.warn('Global error',ev.error||ev.message)});
+window.addEventListener('unhandledrejection',ev=>{console.warn('Promise reject',ev.reason)});
+
+// Init
+(async()=>{ setWho(); await restore(); loadLibs(); })();
+
+})(); 
+</script>
+<script>
+(function () {
+  // Ajusta estos selectores si tu contenedor de recepción usa otro ID o data-atributo.
+  const RECEPCION_SELECTORS = ['#recepcion', '#pantalla-recepcion', '[data-screen="recepcion"]'];
+
+  // Palabras clave para identificar los campos a limpiar sin depender de IDs exactos.
+  const FIELD_KEYWORDS = [
+    'proveedor', 'origen',
+    'nº factura', 'n° factura', 'numero factura', 'num factura', 'factura',
+    'nº orden de compra', 'n° orden de compra', 'orden de compra', 'oc',
+    'destino'
+  ];
+
+  function normalize(str) {
+    return (str || '')
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // quita acentos
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function isTargetField(input) {
+    const attrs = [
+      input.name,
+      input.id,
+      input.placeholder,
+      input.getAttribute('aria-label'),
+      input.getAttribute('data-label')
+    ].map(normalize).join(' | ');
+
+    return FIELD_KEYWORDS.some(kw => attrs.includes(kw));
+  }
+
+  function clearReceptionFields(root) {
+    if (!root) return;
+    const inputs = root.querySelectorAll('input, textarea, select');
+
+    inputs.forEach(el => {
+      if (!isTargetField(el)) return;
+
+      if (el.tagName === 'SELECT') {
+        // Resetea select al primer option vacío o al índice 0
+        const emptyOption = el.querySelector('option[value=""]') || el.querySelector('option:not([value])');
+        if (emptyOption) {
+          emptyOption.selected = true;
+        } else {
+          el.selectedIndex = 0;
+        }
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      } else {
+        // Inputs y textareas
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          el.checked = false;
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        } else {
+          el.value = '';
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    });
+  }
+
+  function findReceptionContainer() {
+    for (const sel of RECEPCION_SELECTORS) {
+      const el = document.querySelector(sel);
+      if (el) return el;
+    }
+    return null;
+  }
+
+  function onReceptionEnter() {
+    const cont = findReceptionContainer();
+    if (cont) clearReceptionFields(cont);
+  }
+
+  // 1) Limpia al cargar si la vista de recepción ya está visible.
+  window.addEventListener('DOMContentLoaded', () => {
+    onReceptionEnter();
+  });
+
+  // 2) Si tu SPA usa hash para navegar (#recepcion), limpia al cambiar.
+  window.addEventListener('hashchange', () => {
+    onReceptionEnter();
+  });
+
+  // 3) Observa cambios de visibilidad en caso de tabs/pestañas internas (sin hash).
+  const observer = new MutationObserver(() => {
+    const cont = findReceptionContainer();
+    if (!cont) return;
+    const visible = cont.offsetParent !== null || getComputedStyle(cont).display !== 'none';
+    if (visible) onReceptionEnter();
+  });
+
+  // Observa el body por si cambian clases/estilos de paneles
+  observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'style', 'hidden'] });
+})();
+</script>
+<!-- Seguridad de sesión: sin persistencia entre cierres de navegador -->
+<script>
+(function () {
+  const AUTH_KEY = 'auth.loggedIn';
+
+  // Obliga a estar logeado: si no hay sesión, muestra la pantalla de login
+  function requireAuth() {
+    const logged = sessionStorage.getItem(AUTH_KEY) === '1';
+    // Ajusta este selector/ruta a tu pantalla de login
+    const loginView = document.querySelector('#login, #pantalla-login, [data-screen="login"]');
+    const isOnLogin = loginView && (loginView.offsetParent !== null || getComputedStyle(loginView).display !== 'none');
+
+    if (!logged && !isOnLogin) {
+      // Si usas SPA por hash:
+      if (location.hash !== '#login') location.hash = '#login';
+      // O, si manejas tabs/visibilidad, aquí puedes activar la vista de login manualmente
+    }
+  }
+
+  // Llama a requireAuth al cargar y cuando cambie la navegación por hash
+  document.addEventListener('DOMContentLoaded', requireAuth);
+  window.addEventListener('hashchange', requireAuth);
+
+  // Función a invocar al validar el login (ajústala en tu submit)
+  window.__setLoggedIn = function () {
+    sessionStorage.setItem(AUTH_KEY, '1');
+  };
+
+  // Limpieza agresiva por si alguien intentó usar localStorage
+  function wipeCreds() {
+    const keys = [
+      'auth.user','auth.username','auth.email','auth.password','auth.pass','auth.token',
+      'usuario','user','username','password','pass','token','auth.loggedIn'
+    ];
+    try {
+      keys.forEach(k => { sessionStorage.removeItem(k); localStorage.removeItem(k); });
+    } catch (_) {}
+    // Borra caches si hay service worker
+    if ('caches' in window) {
+      caches.keys().then(all => all.forEach(k => caches.delete(k)));
+    }
+  }
+
+  // Por defecto sessionStorage muere al cerrar el navegador.
+  // Igual borramos cualquier rastro si intentaron persistir algo.
+  window.addEventListener('beforeunload', wipeCreds);
+})();
+</script>
+
+</body></html>
